@@ -14,8 +14,11 @@ def main():
             print(f"{index+1}/{len(ID_NAME_LIST)}: {app_id} - {app_name}...")
             achievement_percentage = get_game_achievement_percentage(os.getenv("STEAM_API_KEY"), os.getenv("STEAM_USER_ID"), app_id)
             with open(f'{os.getenv("STEAM_USER_ID")}.txt', 'a') as f:
-                id_name_string = f"{app_id} - {app_name}: "
+                id_name_string = f"{app_id} - {app_name} - "
                 achievement_percentage_str = achievement_percentage if type(achievement_percentage) == str else f"{achievement_percentage * 100:.2f}%"
+
+                # GET GAME COMPLETION TIME
+
                 print(id_name_string + achievement_percentage_str, file=f)
         except Exception as e:
             print(f"Error fetching data for app ID {app_id}: {e}")
