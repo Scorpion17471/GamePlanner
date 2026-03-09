@@ -12,8 +12,9 @@ def get_owned_game_app_ids(steam_api_key, steam_user_id):
     - A list of tuples (app ID, game name) representing the games owned by the user.
     """
     STEAM_ENDPOINT_GET_OWNED_GAMES = r"https://api.steampowered.com/"
-    + r"IPlayerService/GetOwnedGames/v0001/?key=" + steam_api_key + r"&steamid="
-    + steam_user_id + r"&include_appinfo=true&include_played_free_games=true"
+    STEAM_ENDPOINT_GET_OWNED_GAMES += r"IPlayerService/GetOwnedGames/v0001/?key="
+    STEAM_ENDPOINT_GET_OWNED_GAMES += str(steam_api_key) + r"&steamid=" + str(steam_user_id)
+    STEAM_ENDPOINT_GET_OWNED_GAMES += r"&include_appinfo=true&include_played_free_games=true"
     
     r = requests.get(STEAM_ENDPOINT_GET_OWNED_GAMES)
     if r.status_code == 200:
@@ -34,11 +35,12 @@ def get_game_achievement_percentage(steam_api_key, steam_user_id, app_id):
     - (int | str) app_id: The app ID of the game for which you want to fetch achievement data.
 
     Returns:
-    - (float) The percentage of achievements unlocked for that game.
+    - (int, int) | (str, int) Tuple containing unlocked and total achievment counts, or "N/A" and 0 if the data cannot be fetched
     """
     STEAM_ENDPOINT_GET_ACHIEVEMENTS = r"https://api.steampowered.com/"
-    + "ISteamUserStats/GetPlayerAchievements/v0001/?key=" + steam_api_key + "&steamid="
-    + steam_user_id + "&appid=" + str(app_id)
+    STEAM_ENDPOINT_GET_ACHIEVEMENTS += "ISteamUserStats/GetPlayerAchievements/v0001/?key="
+    STEAM_ENDPOINT_GET_ACHIEVEMENTS += str(steam_api_key) + "&steamid=" + str(steam_user_id)
+    STEAM_ENDPOINT_GET_ACHIEVEMENTS += "&appid=" + str(app_id)
     
     r = requests.get(STEAM_ENDPOINT_GET_ACHIEVEMENTS)
     if r.status_code == 200:
@@ -46,8 +48,7 @@ def get_game_achievement_percentage(steam_api_key, steam_user_id, app_id):
         achievement_percent = 0.0
         if "playerstats" in data and "achievements" in data["playerstats"]:
             achievements = data["playerstats"]["achievements"]
-            achievement_percent = sum(1 for ach in achievements
-                                        if ach["achieved"] == 1) / len(achievements)
-        return achievement_percent
+            unlocked_count = sum(1 for ach in achievements if ach["achieved"] == 1)
+        return (unlocked_count, len(achievements))
     else:
-        return "N/A"
+        return ("N/A", 0)
