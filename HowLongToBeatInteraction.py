@@ -1,6 +1,6 @@
 from howlongtobeatpy import HowLongToBeat
 
-def get_game_time(game_name, queue):
+def get_game_time(game_name, queue, HLTB):
     """
     Fetches the estimated completion time for a given game from HowLongToBeat.
 
@@ -14,21 +14,18 @@ def get_game_time(game_name, queue):
         If an error occurs, it prints the error message.
     """
     try:
-        results = HowLongToBeat(0.7).search(game_name, similarity_case_sensitive=False)
+        results = HLTB.search(game_name, similarity_case_sensitive=False)
         if results is not None and len(results) > 0:
             best_element = max(results, key=lambda element: element.similarity)
             
             # Get longest time for game entry
-            queue.put(
-                max(
-                    best_element.main_story,
-                    best_element.main_extra,
-                    best_element.completionist,
-                    best_element.all_styles,
-                    best_element.coop_time,
-                    best_element.mp_time
-                )
+            return max(
+                best_element.main_story,
+                best_element.main_extra,
+                best_element.completionist,
+                best_element.all_styles,
+                best_element.coop_time,
+                best_element.mp_time
             )
-            return
     except Exception as e:
         queue.put("N/A")
