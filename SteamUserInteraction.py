@@ -1,6 +1,6 @@
 import requests
 
-def get_owned_game_app_ids(steam_api_key, steam_user_id):
+def get_owned_game_app_ids(steam_api_key: str, steam_user_id: str):
     """
     Fetches the list of owned game app IDs for a given Steam user.
 
@@ -25,30 +25,30 @@ def get_owned_game_app_ids(steam_api_key, steam_user_id):
     else:
         raise Exception(f"Failed to fetch owned games: {r.status_code} - {r.text}")
 
-def get_game_achievement_percentage(steam_api_key, steam_user_id, app_id):
+def get_game_achievements(steam_api_key: str, steam_user_id: str, app_id: str):
     """
     Fetches the percentage of achievements unlocked for a specific game for a given Steam user.
 
     Parameters:
-    - (str) steam_api_key: Your Steam API key.
-    - (str) steam_user_id: The Steam user ID (64-bit) of the user whose achievements you want to fetch.
-    - (int | str) app_id: The app ID of the game for which you want to fetch achievement data.
+    - steam_api_key: Your Steam API key.
+    - steam_user_id: The Steam user ID (64-bit) of the user whose achievements you want to fetch.
+    - app_id: The app ID of the game for which you want to fetch achievement data.
 
     Returns:
-    - (int, int) | (str, int) Tuple containing unlocked and total achievment counts, or "N/A" and 0 if the data cannot be fetched
+    - Tuple containing unlocked and total achievment counts, or (None, None) if the data cannot be fetched
     """
     STEAM_ENDPOINT_GET_ACHIEVEMENTS = r"https://api.steampowered.com/"
-    STEAM_ENDPOINT_GET_ACHIEVEMENTS += "ISteamUserStats/GetPlayerAchievements/v0001/?key="
+    STEAM_ENDPOINT_GET_ACHIEVEMENTS += r"ISteamUserStats/GetPlayerAchievements/v0001/?key="
     STEAM_ENDPOINT_GET_ACHIEVEMENTS += str(steam_api_key) + "&steamid=" + str(steam_user_id)
     STEAM_ENDPOINT_GET_ACHIEVEMENTS += "&appid=" + str(app_id)
     
     r = requests.get(STEAM_ENDPOINT_GET_ACHIEVEMENTS)
     if r.status_code == 200:
         data = r.json()
-        achievement_percent = 0.0
         if "playerstats" in data and "achievements" in data["playerstats"]:
             achievements = data["playerstats"]["achievements"]
             unlocked_count = sum(1 for ach in achievements if ach["achieved"] == 1)
-        return (unlocked_count, len(achievements))
+            return (unlocked_count, len(achievements))
+        return (None, None)
     else:
-        return ("N/A", 0)
+        return (None, None)

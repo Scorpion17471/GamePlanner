@@ -1,12 +1,10 @@
-from howlongtobeatpy import HowLongToBeat
-
-def get_game_time(game_name, queue, HLTB):
+def get_game_time(game_name: str, HLTB):
     """
     Fetches the estimated completion time for a given game from HowLongToBeat.
 
     Parameters:
     - game_name: The name of the game for which to fetch the completion time.
-    - queue: A multiprocessing Queue to store the result.
+    - HLTB: HowLongToBeat instance to use for searching the game.
 
     Returns:
     - None | Exception: The function does not return a value but
@@ -28,4 +26,4 @@ def get_game_time(game_name, queue, HLTB):
                 best_element.mp_time
             )
     except Exception as e:
-        queue.put("N/A")
+        return None
